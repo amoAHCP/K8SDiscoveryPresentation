@@ -1,0 +1,29 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    name: read-ext2
+    version: v2
+    visualize: "true"
+  name: read-ext2
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8090
+    name: main-port
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: read-ext2
+subsets:
+  - addresses:
+      - ip: 172.20.10.5
+    ports:
+      - port: 8090
+        name: main-port
+
+
+

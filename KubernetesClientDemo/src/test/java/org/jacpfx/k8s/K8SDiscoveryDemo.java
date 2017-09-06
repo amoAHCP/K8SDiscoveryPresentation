@@ -205,66 +205,81 @@
 
 package org.jacpfx.k8s;
 
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import java.util.stream.Stream;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import io.fabric8.annotations.ServiceName;
+import io.fabric8.annotations.WithLabel;
+import io.fabric8.annotations.WithLabels;
+import org.jacpfx.client.Fabric8DiscoveryClient;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class KubernetesClientApiDemo {
+public class K8SDiscoveryDemo {
 
   // Start minikube & execute: kubectl proxy // find token by executing: kubectl describe secret
-  private DefaultKubernetesClient client;
+  private Fabric8DiscoveryClient client;
+
   @Before
- public void before() {
-   ConfigBuilder configBuilder = new ConfigBuilder().
-       withMasterUrl("http://localhost:8001").
-       withNamespace("default");
-   final Config build = configBuilder.build();
-   client = new DefaultKubernetesClient(build);
- }
+  public void before() {
+    client = Fabric8DiscoveryClient.builder().
+        user(null).
+        pwd(null).
+        apiToken(null).
+        masterUrl("http://localhost:8001").
+        namespace("default");
+  }
 
   @Test
-  public void listAllServices() {
+  public void findServiceByName() {
     Assert.assertNotNull(client);
-    Stream.of(client.services().list()).forEach(l -> {
-      l.getItems().forEach(e -> System.out.println(
-          e.getMetadata().getName() + ":" + e.getSpec().getClusterIP() + ":" + e.getSpec()
-              .getPorts()));
+    client.findServiceByName("read-ex*", service -> {
+      System.out.println(service.getMetadata());
+    }, error -> {
+
     });
   }
 
   @Test
-  public void listAllEndpoints() {
-    Assert.assertNotNull(client);
-    Stream.of(client.endpoints().list()).forEach(l -> {
-      l.getItems().forEach(e -> {
-        System.out.println(":::::"+e.getMetadata().getName());
-        e.getSubsets().forEach(subset -> {
-          subset.getPorts().forEach(ports -> {
-            System.out.println("ports: "+ports.getName()+"  : "+ports.getPort());
-          });
-          subset.getAddresses().forEach(address -> {
-            System.out.println(address.getIp()+" : "+address.getAdditionalProperties());
-          });
-        });
-      });
-    });
+  public void resolveBeanAnnotations() {
+
+    TestBean bean = new TestBean();
+    client.resolveAnnotations(bean);
+    assertNotNull(bean.simpleServiceNameAndManyLabel);
+    assertTrue(bean.simpleServiceNameAndManyLabel.equals(bean.simpleServiceName));
+    System.out.println(bean.simpleServiceNameAndManyLabel);
+    System.out.println(bean.simpleServiceNameAndLabel);
   }
 
-  @Test
-  public void listAllPods() {
-    Assert.assertNotNull(client);
-    Stream.of(client.pods().list()).forEach(l -> {
-      l.getItems().forEach(e -> {
-        System.out.println(":::::"+e.getMetadata().getName());
-        System.out.println(e.getSpec().getContainers().get(0));
-      });
-    });
+  public class TestBean {
+
+    @ServiceName("read-ext2")
+    private String simpleServiceName;
+    @ServiceName
+    @WithLabel(name = "version", value = "v1")
+    private String simpleServiceNameAndLabel;
+    @ServiceName
+    @WithLabels(value = {
+        @WithLabel(name = "version", value = "v2"),
+        @WithLabel(name = "visualize", value = "true")})
+    private String simpleServiceNameAndManyLabel;
+
+    public String getSimpleServiceName() {
+      return simpleServiceName;
+    }
+
+
+    public String getSimpleServiceNameAndLabel() {
+      return simpleServiceNameAndLabel;
+    }
+
+
+    public String getSimpleServiceNameAndManyLabel() {
+      return simpleServiceNameAndManyLabel;
+    }
+
+
   }
-
-
 
 }

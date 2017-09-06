@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: read
+    visualize: "true"
+  name: read
+spec:
+  type: LoadBalancer
+  ports:
+    - name: defaultport
+      protocol: TCP
+      port: 80
+      targetPort: 9376
+    - name: secureport
+      protocol: TCP
+      port: 443
+      targetPort: 9377
+  selector:
+    app: read

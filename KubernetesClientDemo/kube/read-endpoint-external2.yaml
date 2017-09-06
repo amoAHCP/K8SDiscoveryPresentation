@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: read-ext2
+subsets:
+  - addresses:
+      - ip: 172.20.10.5
+    ports:
+      - port: 8090
+
