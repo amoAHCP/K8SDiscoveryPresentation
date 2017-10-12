@@ -1,0 +1,22 @@
+metadata:
+  name: person
+  annotations:
+    configmap.fabric8.io/update-on-change: readconf
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: person
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: readconf
+            items:
+            - key: application.properties
+              path: application.properties
+      containers:
+        - volumeMounts:
+            - name: config
+              mountPath: /deployments/config

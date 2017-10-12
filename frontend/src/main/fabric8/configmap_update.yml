@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend
+data:
+  application.properties: |
+    server.port = 8080
+    person.host = person
+    label.byId.version= v2
+    label.byId.name= person
+    label.all.version= v1
+    label.all.name = person

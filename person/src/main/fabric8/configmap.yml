@@ -1,0 +1,8 @@
+metadata:
+  name: readconf
+data:
+  application.properties: |
+    mongo.database=test
+    mongo.database.url=mongodb://mongo
+    spring.data.mongodb.database=test
+    server.port = 8090

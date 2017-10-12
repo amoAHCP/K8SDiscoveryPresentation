@@ -1,0 +1,13 @@
+metadata:
+  labels:
+    expose: true
+    name: person
+    version: v1
+    visualize: "true"
+  name: person
+spec:
+  ports:
+    - port: 8090
+      targetPort: 8090
+  selector:
+    name: person

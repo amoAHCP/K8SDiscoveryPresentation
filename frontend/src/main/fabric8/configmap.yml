@@ -1,0 +1,10 @@
+metadata:
+  name: ${project.artifactId}
+data:
+  application.properties: |
+    server.port = 8080
+    person.host = person
+    label.byId.version= v1
+    label.byId.name= person
+    label.all.version= v1
+    label.all.name = person
